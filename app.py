@@ -8,18 +8,14 @@ from groq import Groq
 from dotenv import load_dotenv
 from rapidfuzz import fuzz
 
-# ======================
-# CONFIG PAGE & THEME
-# ======================
+
 st.set_page_config(
     page_title="CinéBot Elite",
     page_icon="🎬",
-    layout="wide"  # Nécessaire pour injecter le CSS de contrôle de largeur
+    layout="wide"
 )
 
-# ======================
-# CSS AVANCÉ (Fix dézoom & Design Moderne)
-# ======================
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
@@ -83,9 +79,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ======================
-# CHARGEMENT SÉCURISÉ DES RESSOURCES
-# ======================
+
 @st.cache_resource(show_spinner=False)
 def load_all():
     # Gestion sécurisée de la clé API (Cloud vs Local)[cite: 1]
@@ -159,11 +153,7 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
-# ======================
-# INTERFACE DE CHAT
-# ======================
 
-# Accueil si vide
 if not st.session_state.messages and "current_query" not in st.session_state:
     st.markdown("""
         <div class="hero-section">
@@ -172,12 +162,12 @@ if not st.session_state.messages and "current_query" not in st.session_state:
         </div>
     """, unsafe_allow_html=True)
 
-# Affichage des messages
+
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"], unsafe_allow_html=True)
 
-# Gestion de la saisie
+
 query = st.chat_input("Décrivez un film ou posez une question...")
 if "current_query" in st.session_state:
     query = st.session_state.pop("current_query")
@@ -191,7 +181,7 @@ if query:
         with st.spinner("Exploration de la base de données..."):
             results = search(query)
 
-            # Cartes de films trouvés
+
             if results:
                 for doc in results:
                     st.markdown(f"""
