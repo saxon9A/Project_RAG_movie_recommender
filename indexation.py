@@ -32,7 +32,7 @@ def movie_to_text(row):
 
 
 def main():
-    print("📥 Chargement des données...")
+    print(" Chargement des données...")
     df = pd.read_csv(DATA_PATH)
     df = df.dropna(subset=["title", "overview"])  # Supprime les films sans synopsis
 
@@ -41,7 +41,7 @@ def main():
     print("🧹 Préparation des documents...")
     for i, row in tqdm(df.iterrows(), total=len(df)):
         text = movie_to_text(row)
-        # ✅ 1 film = 1 chunk (plus de découpage par caractères qui cassait les textes)
+
         documents.append({
             "content": text,
             "metadata": {
@@ -51,7 +51,7 @@ def main():
             }
         })
 
-    print(f"📄 Nombre de films : {len(documents)}")
+    print(f" Nombre de films : {len(documents)}")
 
     print("🧠 Création des embeddings...")
     model = SentenceTransformer("all-mpnet-base-v2")
@@ -62,14 +62,14 @@ def main():
         convert_to_numpy=True
     ).astype("float32")
 
-    # ✅ Normalisation L2 obligatoire pour cohérence avec la recherche
+
     faiss.normalize_L2(embeddings)
 
-    print("📦 Création de l'index FAISS...")
+    print(" Création de l'index FAISS...")
     dimension = embeddings.shape[1]
     index = faiss.IndexFlatL2(dimension)
     index.add(embeddings)
-    print(f"✅ {index.ntotal} vecteurs indexés")
+    print(f" {index.ntotal} vecteurs indexés")
 
     print("💾 Sauvegarde...")
     os.makedirs("embeddings", exist_ok=True)
