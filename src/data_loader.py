@@ -1,0 +1,1 @@
+def load_movies(path: str) -> pd.DataFrame:

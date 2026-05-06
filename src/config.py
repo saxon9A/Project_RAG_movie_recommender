@@ -1,0 +1,4 @@
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 50
+TOP_K = 4
+EMBEDDING_MODEL = "all-mpnet-base-v2"

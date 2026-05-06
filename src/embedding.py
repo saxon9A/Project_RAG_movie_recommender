@@ -1,0 +1,1 @@
+def embed_texts(texts: list[str]) -> np.ndarray:

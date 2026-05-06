@@ -1,0 +1,1 @@
+def search(query, model, index, chunks, k=4)
