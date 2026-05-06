@@ -1,0 +1,16 @@
+# Secrets et configuration
+.env
+.streamlit/
+secrets.toml
+
+# Environnements virtuels
+venv/
+.venv/
+env/
+
+# Fichiers système et IDE
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+.DS_Store
