@@ -24,3 +24,27 @@ Le système combine une **recherche sémantique vectorielle** (FAISS) et une **r
 ---
 
 ## 🏗️ Architecture
+Question utilisateur
+│
+▼
+┌───────────────────┐     ┌──────────────────────┐
+│  Recherche titre  │     │  Recherche sémantique │
+│  (rapidfuzz +     │     │  (FAISS + embedding   │
+│   traduction FR)  │     │   all-mpnet-base-v2)  │
+└────────┬──────────┘     └──────────┬───────────┘
+│                           │
+└──────────┬────────────────┘
+▼
+Fusion & déduplication
+│
+▼
+Top-5 films pertinents
+│
+▼
+Prompt structuré + contexte
+│
+▼
+LLM Groq (llama-3.1-8b-instant)
+│
+▼
+Réponse en français
