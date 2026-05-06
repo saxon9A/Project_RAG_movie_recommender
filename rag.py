@@ -7,18 +7,14 @@ from groq import Groq
 from dotenv import load_dotenv
 from rapidfuzz import fuzz, process
 
-# ======================
-# CONFIG
-# ======================
+
 INDEX_PATH = "embeddings/faiss_index.bin"
 CHUNKS_PATH = "embeddings/chunks.json"
 TOP_K = 5
 
-# ======================
-# TRADUCTIONS FR → EN + SYNONYMES
-# ======================
+
 FR_TO_EN_TITLES = {
-    # IA / Tech
+
     "l'ia": "artificial intelligence",
     "ia": "artificial intelligence",
     "intelligence artificielle": "artificial intelligence",
@@ -128,7 +124,7 @@ FR_TO_EN_TITLES = {
     "avatar": "avatar",
 }
 
-# Mots à ignorer
+
 STOPWORDS = {
     "film", "movie", "cinema", "the", "une", "un", "des",
     "les", "du", "dans", "pour", "avec", "sur", "qui",
@@ -144,15 +140,10 @@ STOPWORDS = {
     "concernant", "penses", "pense", "connais-tu", "parle",
 }
 
-# ======================
-# LOAD ENV
-# ======================
+
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# ======================
-# LOAD DATA
-# ======================
 print("📦 Chargement de l'index...")
 index = faiss.read_index(INDEX_PATH)
 print("📄 Chargement des chunks...")
@@ -161,12 +152,10 @@ with open(CHUNKS_PATH, "r", encoding="utf-8") as f:
 
 model = SentenceTransformer("all-mpnet-base-v2")
 
-# Liste des titres pour rapidfuzz
+
 all_titles_lower = [doc["metadata"]["title"].lower() for doc in documents]
 
-# ======================
-# RECHERCHE PAR TITRE (rapidfuzz)
-# ======================
+
 def search_by_title(query: str):
     query_lower = query.lower()
 
@@ -199,11 +188,9 @@ def search_by_title(query: str):
         if not title_words:
             continue
 
-        # ✅ Stratégie 1 : titre complet présent dans la question
         title_in_query = title_lower in query_lower
 
-        # ✅ Stratégie 2 : fuzzy sur chaque mot du TITRE contre la question
-        # (et non l'inverse) pour éviter les faux positifs
+
         word_scores = [
             max(fuzz.ratio(tw, qw) for qw in query_words)
             for tw in title_words
@@ -211,7 +198,7 @@ def search_by_title(query: str):
         matched_words = sum(1 for s in word_scores if s >= 85)
         match_ratio = matched_words / len(title_words)
 
-        # Seuil selon longueur du titre
+
         if len(title_words) == 1:
             strong_match = matched_words >= 1
         elif len(title_words) == 2:
@@ -241,9 +228,6 @@ def search_by_title(query: str):
 
     return results[:TOP_K]
 
-# ======================
-# RECHERCHE SÉMANTIQUE
-# ======================
 def search_semantic(query: str, score_threshold: float = 0.95):
     query_vector = model.encode([query]).astype("float32")
     faiss.normalize_L2(query_vector)
@@ -264,9 +248,7 @@ def search_semantic(query: str, score_threshold: float = 0.95):
         })
     return results
 
-# ======================
-# RECHERCHE HYBRIDE
-# ======================
+
 def search(query: str):
     title_results = search_by_title(query)
     threshold = 0.95 if title_results else 1.1  # était 1.0
@@ -283,9 +265,7 @@ def search(query: str):
 
     return combined[:TOP_K]
 
-# ======================
-# PROMPT
-# ======================
+
 def build_prompt(context, question):
     if not context:
         return (
@@ -325,9 +305,7 @@ QUESTION : {question}
 RÉPONSE :
 """
 
-# ======================
-# GENERATE
-# ======================
+
 def generate_answer(question, context):
     prompt = build_prompt(context, question)
     response = client.chat.completions.create(
@@ -349,9 +327,7 @@ def generate_answer(question, context):
     )
     return response.choices[0].message.content
 
-# ======================
-# MAIN LOOP
-# ======================
+
 def main():
     print("🎬 RAG Film prêt ! Tape 'quit' pour quitter.\n")
     while True:
