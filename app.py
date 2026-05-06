@@ -8,9 +8,7 @@ from groq import Groq
 from dotenv import load_dotenv
 import pandas as pd  # Ajouté pour le tableau de comparaison
 
-# ==========================================
-# 1. CONFIGURATION ET STYLE (Inchangé + Ajout Comparaison)
-# ==========================================
+
 st.set_page_config(page_title="CinéBot Elite", page_icon="🎬", layout="wide")
 
 st.markdown("""
@@ -38,9 +36,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ==========================================
-# 2. CHARGEMENT (Inchangé)
-# ==========================================
 @st.cache_resource(show_spinner=False)
 def load_all():
     if "GROQ_API_KEY" in st.secrets:
@@ -69,9 +64,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-# ==========================================
-# 3. NOUVELLES FONCTIONS : COMPARAISON
-# ==========================================
 def search(query, k=4):
     vector = model.encode([query]).astype("float32")
     faiss.normalize_L2(vector)
@@ -89,12 +81,10 @@ def generate_response(question, context):
     return res.choices[0].message.content
 
 
-# Récupérer la liste unique de tous les titres de films pour le sélecteur
+
 all_titles = sorted(list(set([doc['metadata']['title'] for doc in documents])))
 
-# ==========================================
-# 4. BARRE LATÉRALE (SIDEBAR) AMÉLIORÉE
-# ==========================================
+
 with st.sidebar:
     st.markdown("<h2 style='color:#e8b84b;'>🎬 CinéBot Elite</h2>", unsafe_allow_html=True)
 
@@ -123,9 +113,6 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
-# ==========================================
-# 5. LOGIQUE D'AFFICHAGE (Avec Comparaison)
-# ==========================================
 if not st.session_state.messages and "current_query" not in st.session_state:
     st.markdown('<div class="hero-section"><h1 class="hero-title">Trouvez votre prochain film.</h1></div>',
                 unsafe_allow_html=True)
@@ -145,11 +132,11 @@ if query:
         st.markdown(query)
 
     with st.chat_message("assistant"):
-        # Cas spécial : Affichage du tableau de comparaison
+
         if "comp_data" in st.session_state:
             d1, d2 = st.session_state.pop("comp_data")
 
-            # Affichage visuel du duel
+            
             st.markdown(f"""
             <table class="comp-table">
                 <tr><th>Critère</th><th>{d1['metadata']['title']}</th><th>{d2['metadata']['title']}</th></tr>
